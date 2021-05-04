@@ -1,0 +1,15 @@
+Exercise 3 
+1NF
+DB ( PatientNo, FullName, WardNo, WardName, DrugNo, DrugName, Description, Dosage, Method, Units/day, Startdate, finishdate)
+PK : PatientNo, DrugNo, Startdate
+
+2NF
+Patient : *patientNo*, fullname, wardno, Wardname
+Drug: *drugNo*, Drugname, description, Dosage, Method
+Doses : *patientNo*, *DrugNo*, *start*, U/D, Finish
+
+3NF
+Patient: *patientNo, Fullname, WardNo
+Ward: WardNo, WardName
+Drug: *DrugNo*, Drugname, Description, Dosage, Method
+doses *PatientNo*, *drugNo*, *Start*, U/D, Finish
