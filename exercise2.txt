@@ -1,0 +1,22 @@
+1NF
+- no repeating groups
+- all atributes are defined
+- all atributes depend on primary key
+ --> DB (StaffNo, DentistName, PatientNo, PatientName, AppointmentDate, appointmentTime, SugeryNo)
+--> PK (StaffNo, PatientNo)
+
+2NF
+- No partial dependencies
+
+--> staff_patient (StaffNo, PatientNo, AppointmentDate, AppointmentTime, SurgeryNo)
+--> Staff (StaffNo, Dentistname)
+--> 
+
+3NF
+- no transitive dependencies
+ --> appointment: StaffNo, PatientNo, AppointmentDate, AppointmentTime, SurgeryNo
+--> staff (StaffNo, Dentistname)
+--> Patient (PatientNo, patientName)
+
+BCNF = 3NF
+
