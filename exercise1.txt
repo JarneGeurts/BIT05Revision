@@ -1,0 +1,4 @@
+Creating git connection 
+
+$ git clone https://github.com/JarneGeurts/BIT05Revision.git BIT05Revision
+
