@@ -1,0 +1,144 @@
+
+
+
+1) MariaDB [vacation]> select guestname, guestaddress from guest where guestaddress like "%london" order by guestname;
++--------------+--------------------+
+| guestname    | guestaddress       |
++--------------+--------------------+
+| John Kay     | 56 High St, London |
+| Mike Ritchie | 18 Tain St, London |
++--------------+--------------------+
+
+2)MariaDB [vacation]> select guestname, guestaddress from guest join booking on booking.guestno = guest.guestno join hotel on hotel.hotelno = booking.hotelno where city like "london" order by guestname;
++--------------+-----------------------+
+| guestname    | guestaddress          |
++--------------+-----------------------+
+| Carol Farrel | 6 Achray St, Glasgow  |
+| Joe Keogh    | 2 Fergus Dr, Aberdeen |
+| John Kay     | 56 High St, London    |
+| John Kay     | 56 High St, London    |
+| Mike Ritchie | 18 Tain St, London    |
+| Mike Ritchie | 18 Tain St, London    |
+| Tina Murphy  | 63 Well St, Glasgow   |
++--------------+-----------------------+
+
+
+3)
+MariaDB [vacation]> select * from room where price < 40 AND (type = "double" OR type = "family") order by price;
++--------+---------+--------+-------+
+| roomno | hotelno | type   | price |
++--------+---------+--------+-------+
+|    801 | ch02    | double | 15.00 |
+|    601 | fb01    | double | 29.00 |
+|   1001 | dc01    | double | 30.00 |
+|   1101 | dc01    | family | 35.00 |
+|    701 | fb01    | family | 39.00 |
++--------+---------+--------+-------+
+
+
+4) MariaDB [vacation]> select * from booking where dateto IS NULL;
++---------+---------+------------+--------+--------+
+| hotelno | guestno | datefrom   | dateto | roomno |
++---------+---------+------------+--------+--------+
+| ch01    |   10006 | 2020-04-21 | NULL   |   1101 |
+| dc01    |   10003 | 2020-05-20 | NULL   |   1001 |
+| fb01    |   10001 | 2020-05-01 | NULL   |    701 |
++---------+---------+------------+--------+--------+
+
+
+5)MariaDB [vacation]> select avg(price) from room;
++------------+
+| avg(price) |
++------------+
+|  35.748333 |
++------------+
+
+6) 
+MariaDB [vacation]> select sum(price) from room where type = "double";
++------------+
+| sum(price) |
++------------+
+|     160.00 |
++------------+
+
+7) 
+MariaDB [vacation]> select count(distinct guestno) from booking where (datefrom <= "2020-08-01" and dateto >= "2020-08-01") OR (datefrom >= "2020-08-01" and datefrom <= "2020-08-31");
++-------------------------+
+| count(distinct guestno) |
++-------------------------+
+|                       2 |
++-------------------------+
+
+
+8)MariaDB [vacation]> select type, price from hotel join room on room.hotelno = hotel.hotelno where hotelname = "The Tower Hotel";
++--------+-------+
+| type   | price |
++--------+-------+
+| single | 19.00 |
+| double | 29.00 |
+| family | 39.00 |
++--------+-------+
+
+9)select * from booking join guest on guest.guestno = booking.guestno join hotel on hotel.hotelno = booking.hotelno where DATE(NOW()) between datefrom and dateto and hotelname = "The Tower Hotel";
++---------+---------+------------+------------+--------+---------+--------------+-----------------------+---------+-----------------+--------+
+| hotelno | guestno | datefrom   | dateto     | roomno | guestno | guestname    | guestaddress          | hotelno | hotelname       | city   |
++---------+---------+------------+------------+--------+---------+--------------+-----------------------+---------+-----------------+--------+
+| fb01    |   10004 | 2021-04-15 | 2021-05-15 |    601 |   10004 | Joe Keogh    | 2 Fergus Dr, Aberdeen | fb01    | The Tower Hotel | London |
+| fb01    |   10005 | 2021-05-02 | 2021-05-07 |    501 |   10005 | Carol Farrel | 6 Achray St, Glasgow  | fb01    | The Tower Hotel | London |
++---------+---------+------------+------------+--------+---------+--------------+-----------------------+---------+-----------------+--------+
+
+10)elect * from hotel join booking on hotel.hotelno = booking.hotelno join guest on guest.guestno = booking.guestno join room on room.roomno = booking.roomno and booking.hotelno = room.hotelno where DATE(NOW()) between datefrom and dateto and hotelname = "The Tower Hotel";
++---------+-----------------+--------+---------+---------+------------+------------+--------+---------+--------------+-----------------------+--------+---------+--------+-------+
+| hotelno | hotelname       | city   | hotelno | guestno | datefrom   | dateto     | roomno | guestno | guestname    | guestaddress          | roomno | hotelno | type   | price |
++---------+-----------------+--------+---------+---------+------------+------------+--------+---------+--------------+-----------------------+--------+---------+--------+-------+
+| fb01    | The Tower Hotel | London | fb01    |   10004 | 2021-04-15 | 2021-05-15 |    601 |   10004 | Joe Keogh    | 2 Fergus Dr, Aberdeen |    601 | fb01    | double | 29.00 |
+| fb01    | The Tower Hotel | London | fb01    |   10005 | 2021-05-02 | 2021-05-07 |    501 |   10005 | Carol Farrel | 6 Achray St, Glasgow  |    501 | fb01    | single | 19.00 |
++---------+-----------------+--------+---------+---------+------------+------------+--------+---------+--------------+-----------------------+--------+---------+--------+-------+
+
+
+11) select sum(price) from hotel join booking on hotel.hotelno = booking.hotelno join guest on booking.guestno = guest.guestno join room on room.roomno = booking.roomno and room.hotelno = booking.hotelno where DATE(NOW()) between datefrom and dateto and hotelname = "The Tower Hotel";
++------------+
+| sum(price) |
++------------+
+|      48.00 |
++------------+
+
+12)select * from room join hotel on hotel.hotelno = room.hotelno where roomno not in (select room.roomno from hotel join booking on hotel.hotelno = booking.hotelno join guest on guest.guestno = booking.guestno join room on room.roomno = booking.roomno and room.hotelno = booking.hotelno where DATE(NOW()) between datefrom and dateto and hotelname = "The Tower Hotel") and hotelname = "The Tower Hotel";
++--------+---------+--------+-------+---------+-----------------+--------+
+| roomno | hotelno | type   | price | hotelno | hotelname       | city   |
++--------+---------+--------+-------+---------+-----------------+--------+
+|    701 | fb01    | family | 39.00 | fb01    | The Tower Hotel | London |
++--------+---------+--------+-------+---------+-----------------+--------+
+
+
+13)select sum(price) from room join hotel on hotel.hotelno = room.hotelno where roomno not in (select room.roomno from hotel join booking on hotel.hotelno = booking.hotelno
+join guest on guest.guestno = booking.guestno join room on room.roomno = booking.roomno and room.hotelno = booking.hotelno where DATE(NOW()) between datefrom and dateto and hotelname = "The
+Tower Hotel") and hotelname = "The Tower Hotel";
++------------+
+| sum(price) |
++------------+
+|      39.00 |
++------------+
+
+14)select hotelname, count(*) from hotel join room on hotel.hotelno = room.hotelno where hotel.city = "London" group by hotelname;
++-----------------+----------+
+| hotelname       | count(*) |
++-----------------+----------+
+| Omni Shoreham   |        2 |
+| Phoenix Park    |        2 |
+| The Tower Hotel |        3 |
++-----------------+----------+
+
+15) select * from (select hotelname,type, count(type) from hotel join room on hotel.hotelno = room.hotelno join booking on booking.roomno = room.roomno and hotel.hotelno = booking.hotelno where hotel.city = "London" group by hotelname, type order by count(type) desc) as sel1 group by sel1.hotelname;
++-----------------+--------+-------------+
+| hotelname       | type   | count(type) |
++-----------------+--------+-------------+
+| Omni Shoreham   | family |           1 |
+| Phoenix Park    | double |           1 |
+| The Tower Hotel | single |           2 |
++-----------------+--------+-------------+
+
+16)update room set price = price*1.05;
+Query OK, 12 rows affected, 2 warnings (0.006 sec)
+Rows matched: 12  Changed: 12  Warnings: 2
+
